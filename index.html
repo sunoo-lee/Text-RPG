@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TextRPG</title>
+    <style>
+      html {
+        background-color: rgb(36, 36, 36);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      h2 {
+        color: rgb(162, 197, 233);
+
+        color: rgb(36, 36, 36);
+        text-shadow: rgb(162, 197, 233) 0px 0px 7px;
+        font-size: 30px;
+        text-align: center;
+      }
+      .text {
+        margin: 0px auto;
+        text-align: center;
+      }
+      h4 {
+        text-align: center;
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 25px;
+        /* color: rgb(255, 255, 255); */
+        color: rgb(36, 36, 36);
+        text-shadow: white 0px 0px 10px;
+      }
+      #start_screen {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        margin: auto;
+        margin-top: 80px;
+        width: 150px;
+        height: 90px;
+      }
+      input {
+        font-size: 15px;
+        text-align: center;
+        border: 3px solid rgb(172, 172, 172);
+        border-radius: 50px;
+        width: 150px;
+        height: 30px;
+      }
+      #wrap {
+        width: 300px;
+      }
+      #container {
+        padding: 20px;
+        height: 290px;
+        background-color: rgb(94, 94, 94);
+        border: rgb(172, 172, 172) solid 4px;
+        border-radius: 10px;
+      }
+      form {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      button {
+        margin: 5px 5px;
+        width: 75px;
+        height: 35px;
+        font-size: 15px;
+        font-weight: 600;
+        border-radius: 20px;
+        background-color: white;
+        border: rgb(172, 172, 172) solid 2px;
+        color: rgb(41, 41, 41);
+        cursor: pointer;
+      }
+      #replay {
+        width: 100px;
+      }
+      #message {
+        border: 2px solid white;
+        height: 70px;
+        padding: 3px 5px;
+      }
+      #hero_stat,
+      #monster_stat {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        height: 50px;
+        margin: 5px auto;
+      }
+      .hero_text,
+      .monster_text {
+        padding: auto;
+        height: 25px;
+        line-height: 25px;
+        align-items: center;
+      }
+      button:hover {
+        transition: all 0.2s;
+        background-color: rgb(148, 148, 148);
+        color: white;
+      }
+      button:active {
+        background-color: rgb(63, 63, 63);
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrap">
+      <h2>02.12.2022</h2>
+      <h4>TEXT RPG</h4>
+      <div id="container">
+        <h3 id="hero_name" class="text">캐릭터의 이름을 적어주세요</h3>
+        <hr />
+        <form action="" id="start_screen">
+          <input type="text" id="name_input" placeholder="Anonymous H" />
+          <button id="start">START</button>
+        </form>
+        <div id="screen">
+          <div id="hero_stat">
+            <div class="hero_text">
+              <span id="hero_level"></span>
+              <span id="hero_exp"></span>
+            </div>
+            <div class="hero_text">
+              <span id="hero_hp"></span>
+              <span id="hero_att"></span>
+            </div>
+          </div>
+          <div id="message" style="display: none"></div>
+          <div id="monster_stat">
+            <div class="monster_text" id="monster_name"></div>
+            <div class="monster_text">
+              <span id="monster_hp"></span>
+              <span id="monster_att"></span>
+            </div>
+          </div>
+          <div id="game_menu" style="display: none">
+            <hr />
+            <form>
+              <button id="menu_1">모험</button>
+              <button id="menu_2">휴식</button>
+              <button id="menu_3">종료</button>
+            </form>
+          </div>
+          <div id="battle_menu" style="display: none">
+            <hr />
+            <form>
+              <button id="battle_1">공격</button>
+              <button id="battle_2">회복</button>
+              <button id="battle_3">도망</button>
+            </form>
+          </div>
+          <div id="game_over" style="display: none">
+            <hr />
+            <form>
+              <button id="replay">RESTART</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const $startScreen = document.querySelector("#start_screen");
+      const $gameMenu = document.querySelector("#game_menu");
+      const $battleMenu = document.querySelector("#battle_menu");
+      const $gameover = document.querySelector("#game_over");
+
+      const $menu_1 = document.querySelector("#menu_1");
+      const $menu_2 = document.querySelector("#menu_2");
+      const $menu_3 = document.querySelector("#menu_3");
+
+      const $battle_1 = document.querySelector("#battle_1");
+      const $battle_2 = document.querySelector("#battle_2");
+      const $battle_3 = document.querySelector("#battle_3");
+
+      const $replay = document.querySelector("#replay");
+
+      const $heroName = document.querySelector("#hero_name");
+      const $heroLevel = document.querySelector("#hero_level");
+      const $heroHp = document.querySelector("#hero_hp");
+      const $heroExp = document.querySelector("#hero_exp");
+      const $heroAtt = document.querySelector("#hero_att");
+
+      const $monsterName = document.querySelector("#monster_name");
+      const $monsterHp = document.querySelector("#monster_hp");
+      const $monsterAtt = document.querySelector("#monster_att");
+      const $message = document.querySelector("#message");
+      const $monsterStat = document.querySelector("#monster_stat");
+
+      class Game {
+        constructor(name) {
+          this.monster = null;
+          this.hero = null;
+          this.monsterList = [
+            { name: "슬라임", hp: 25, att: 10, exp: 10 },
+            { name: "스켈레톤", hp: 50, att: 10, exp: 15 },
+            { name: "고블린", hp: 50, att: 15, exp: 20 },
+            { name: "좀비", hp: 60, att: 20, exp: 25 },
+          ];
+          this.start(name);
+        }
+
+        start(name) {
+          if (name === "") {
+            $heroName.textContent = "이름을 입력해주세요.";
+            return;
+          } else {
+            console.log(name);
+            $gameMenu.addEventListener("submit", this.onGameMenuInput);
+            $battleMenu.addEventListener("submit", this.onBattleMenuInput);
+            this.changeScreen("game");
+            this.hero = new Hero(this, name);
+            this.showMessage("모닥불이 따뜻하다.");
+            this.updateHeroStat();
+            this.buttonInput();
+          }
+        }
+
+        buttonInput = (event) => {
+          $menu_1.addEventListener("click", () => {
+            this.changeScreen("battle");
+            const randomIndex = Math.floor(
+              Math.random() * this.monsterList.length
+            );
+            const randomMonster = this.monsterList[randomIndex];
+            this.monster = new Monster(
+              this,
+              randomMonster.name,
+              randomMonster.hp,
+              randomMonster.att,
+              randomMonster.exp
+            );
+            this.updateMonsterStat();
+            this.showMessage(
+              `몬스터와 마주쳤다. <br> ${this.monster.name}인 것 같다.`
+            );
+          });
+
+          $menu_2.addEventListener("click", () => {
+            this.hero.hp = this.hero.maxHp;
+            this.updateHeroStat();
+            this.showMessage("충분한 휴식을 취했다.");
+          });
+
+          $menu_3.addEventListener("click", () => {
+            this.quit();
+          });
+
+          $battle_1.addEventListener("click", () => {
+            const { hero, monster } = this;
+            hero.attack(monster);
+            monster.attack(hero);
+            if (hero.hp <= 0) {
+              hero.hp = 0;
+              this.showMessage(
+                `${hero.lv} 레벨에서 전사. <br>새 주인공을 생성하세요.`
+              );
+              this.changeScreen("over");
+            } else if (monster.hp <= 0) {
+              this.showMessage(
+                `몬스터를 잡아 <br>${monster.exp} 경험치를 얻었다.`
+              );
+              hero.getExp(monster.exp);
+              this.monster = null;
+              this.changeScreen("game");
+            } else {
+              // 전투 진행 중
+              this.showMessage(
+                `${hero.att}의 데미지를 주고, <br>${monster.att}의 데미지를 받았다.`
+              );
+            }
+            this.updateHeroStat();
+            this.updateMonsterStat();
+          });
+          $battle_2.addEventListener("click", () => {
+            const { hero, monster } = this;
+            hero.hp = Math.min(hero.maxHp, hero.hp + 20);
+            monster.attack(hero);
+            this.showMessage("체력을 조금 회복했다.");
+            this.updateHeroStat();
+          });
+          $battle_3.addEventListener("click", () => {
+            this.changeScreen("game");
+            this.showMessage("도망쳤다.");
+            this.monster = null;
+            this.updateMonsterStat();
+          });
+
+          $replay.addEventListener("click", () => {
+            this.quit();
+          });
+        };
+
+        changeScreen(screen) {
+          if (screen === "start") {
+            $startScreen.style.display = "flex";
+            $gameMenu.style.display = "none";
+            $battleMenu.style.display = "none";
+            $message.style.display = "none";
+            $gameover.style.display = "none";
+          } else if (screen === "game") {
+            $startScreen.style.display = "none";
+            $gameMenu.style.display = "block";
+            $battleMenu.style.display = "none";
+            $message.style.display = "block";
+            $gameover.style.display = "none";
+          } else if (screen === "battle") {
+            $startScreen.style.display = "none";
+            $gameMenu.style.display = "none";
+            $battleMenu.style.display = "block";
+            $message.style.display = "block";
+            $gameover.style.display = "none";
+          } else if (screen === "over") {
+            $startScreen.style.display = "none";
+            $gameMenu.style.display = "none";
+            $battleMenu.style.display = "none";
+            $message.style.display = "block";
+            $gameover.style.display = "block";
+          }
+        }
+
+        onGameMenuInput = (event) => {
+          event.preventDefault();
+        };
+
+        onBattleMenuInput = (event) => {
+          event.preventDefault();
+        };
+
+        updateHeroStat() {
+          const { hero } = this;
+          if (hero === null) {
+            $heroName.textContent = "";
+            $heroLevel.textContent = "";
+            $heroHp.textContent = "";
+            $heroExp.textContent = "";
+            $heroAtt.textContent = "";
+            return;
+          }
+          $heroName.textContent = hero.name;
+          $heroLevel.textContent = `LV ${hero.lv}`;
+          $heroHp.textContent = `HP ${hero.hp}/${hero.maxHp}`;
+          $heroExp.textContent = `EXP ${hero.exp}/${15 * hero.lv}`;
+          $heroAtt.textContent = `ATT ${hero.att}`;
+        }
+
+        updateMonsterStat() {
+          const { monster } = this;
+          if (monster === null) {
+            $monsterName.textContent = "";
+            $monsterHp.textContent = "";
+            $monsterAtt.textContent = "";
+            return;
+          }
+          $monsterName.textContent = monster.name;
+          $monsterHp.textContent = `HP: ${monster.hp}/${monster.maxHp}`;
+          $monsterAtt.textContent = `ATT: ${monster.att}`;
+        }
+
+        showMessage(text) {
+          $message.innerHTML = text;
+        }
+
+        quit() {
+          this.changeScreen("start");
+          this.hero = null;
+          this.monster = null;
+          this.updateHeroStat();
+          this.updateMonsterStat();
+          $gameMenu.removeEventListener("submit", this.onGameMenuInput);
+          $battleMenu.removeEventListener("submit", this.onBattleMenuInput);
+          game = null;
+        }
+      }
+
+      class Unit {
+        constructor(game, name, hp, att, exp) {
+          this.game = game;
+          this.name = name;
+          this.maxHp = hp;
+          this.hp = hp;
+          this.exp = exp;
+          this.att = att;
+        }
+        attack(target) {
+          target.hp -= this.att;
+        }
+      }
+
+      class Hero extends Unit {
+        constructor(game, name) {
+          super(game, name, 100, 10, 0);
+          this.lv = 1;
+        }
+        heal(monster) {
+          this.hp += 20;
+          this.hp -= monster.att;
+        }
+
+        getExp(exp) {
+          this.exp += exp;
+          if (this.exp >= this.lv * 15) {
+            // 경험치를 다 채우면
+            this.exp -= this.lv * 15; // xp: 5,  lev: 2, maxXp: 15
+            this.lv += 1;
+            this.maxHp += 5;
+            this.att += 5;
+            this.hp = this.maxHp;
+            this.game.showMessage(`레벨업! 레벨 ${this.lv}`);
+          }
+        }
+      }
+
+      class Monster extends Unit {
+        constructor(game, name, hp, att, exp) {
+          super(game, name, hp, att, exp);
+        }
+      }
+
+      let game = null;
+
+      $startScreen.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const name = event.target.name_input.value;
+        game = new Game(name);
+      });
+    </script>
+  </body>
+</html>
